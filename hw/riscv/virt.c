@@ -46,7 +46,7 @@
 
 static const struct MemmapEntry {
     hwaddr base;
-    hwaddr size;    
+    hwaddr size;
 } virt_memmap[] =
 {
     [VIRT_DEBUG] =    {        0x0,      0x100 },
@@ -261,6 +261,41 @@ static void riscv_virt_board_init(MachineState *machine)
     /* copy in the device tree */
     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
     cpu_physical_memory_write(ROM_BASE + sizeof(reset_vec), s->fdt, s->fdt_size);
+
+    // <SANCTUM>
+    // append bootloader segment here */
+    if (machine->firmware) {
+      // Rewrite ROM with a jump to the bootloader
+      uint32_t offset = sizeof(reset_vec)+(s->fdt_size)-12;
+      uint32_t jump_instruction = (((offset >> 1) & 0x3FF) << 21) | (((offset>>11) & 0x1) << 20) | (((offset>>12) & 0xFF) << 12) | (((offset>>20) & 0x1) << 31) | (0 << 7) | (0x6F << 0);
+      cpu_physical_memory_write(ROM_BASE + 12, &jump_instruction, 4);
+
+      printf("Bootloader offset is %" PRIx32 "\n", offset);
+
+      // Append bootloader to boot ROM
+      FILE *bootloader_file;
+      long bootloader_size;
+      char *bootloader_bytes;
+
+      bootloader_file = fopen ( machine->firmware , "rb" );
+      if( !bootloader_file ) perror("Failed to open the bootloader file."),exit(1);
+
+      fseek( bootloader_file , 0L , SEEK_END);
+      bootloader_size = ftell( bootloader_file );
+      rewind( bootloader_file );
+
+      bootloader_bytes = (char*)malloc(bootloader_size * sizeof(char));
+      if( !bootloader_bytes ) fclose(bootloader_file),fputs("Failed to allocate space to read the bootloader file.",stderr),exit(1);
+
+      if( 1!=fread( bootloader_bytes , bootloader_size, 1 , bootloader_file) )
+        fclose(bootloader_file),free(bootloader_bytes),fputs("Failed to read entire bootloader file.",stderr),exit(1);
+
+      fclose(bootloader_file);
+
+      cpu_physical_memory_write(ROM_BASE + sizeof(reset_vec)+s->fdt_size, bootloader_bytes, bootloader_size);
+      free(bootloader_bytes);
+    }
+    // </SANCTUM>
 
     /* add memory mapped htif registers at location specified in the symbol
        table of the elf being loaded (thus kernel_filename is passed to the

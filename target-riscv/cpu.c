@@ -119,6 +119,17 @@ void restore_state_to_opc(CPURISCVState *env, TranslationBlock *tb,
     env->pc = data[0];
 }
 
+/*
+inline void puf_reset( puf_t * puf) {
+  puf->select = 0;
+  puf->disable = 0;
+  int i;
+  for (i=0; i<=PUF_SELECT_MASK; i++) {
+    puf->bits[i] = 0xDEADBEEF % i;
+  }
+}
+*/
+
 static void riscv_cpu_reset(CPUState *s)
 {
     RISCVCPU *cpu = RISCV_CPU(s);
@@ -132,6 +143,7 @@ static void riscv_cpu_reset(CPUState *s)
     env->priv = PRV_M;
     env->mtvec = DEFAULT_MTVEC;
 #endif
+    //puf_reset(&(env->puf));
     env->pc = DEFAULT_RSTVEC;
     cs->exception_index = EXCP_NONE;
 }

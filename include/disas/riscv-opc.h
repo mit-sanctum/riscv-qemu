@@ -557,6 +557,64 @@
 #define CSR_MTVEC 0x305
 #define CSR_MCOUNTEREN 0x306
 #define CSR_MSCRATCH 0x340
+// <SANCTUM>
+  /*
+  // ## The addresses of various CSRs (registers) introduced by Sanctum are given here.
+
+  // ### Enclave virtual base and mask
+  // (per-core) registers
+  // ( defines a virtual region for which enclave page tables are used in
+  //   place of OS-controlled page tables)
+  // (machine-mode non-standard read/write)
+  #define CSR_MEVBASE 0x7c0
+  #define CSR_MEVMASK 0x7c1
+
+  // ### Enclave page table base
+  // (per core) register
+  // ( pointer to a separate page table data structure used to translate enclave
+  //   virtual addresses)
+  // (machine-mode non-standard read/write)
+  #define CSR_MEPTBR 0x7c2
+
+  // ### DRAM bitmap
+  // (per core) registers (OS and Enclave)
+  // ( white-lists the DRAM regions the core is allowed to access via OS and
+  //   enclave virtual addresses)
+  // (machine-mode non-standard read/write)
+  #define CSR_MDRBMAP 0x7c3
+  #define CSR_MEDRBMAP 0x7c4
+
+  // ### Protected region base and mask
+  // (per core) registers (OS and Enclave)
+  // ( these are used to prevent address translation into a specific range of
+  //   physical addresses, for example to protect the security monitor from all software)
+  // (machine-mode non-standard read/write)
+  #define CSR_MPARBASE 0x7c5
+  #define CSR_MPARMASK 0x7c6
+  #define CSR_MEPARBASE 0x7c7
+  #define CSR_MEPARMASK 0x7c8
+
+  // ### DMA base and mask:
+  // (system-wide) register
+  // (machine-mode non-standard read/write)
+  #define CSR_MDMABASE 0x7c9
+  #define CSR_MDMAMASK 0x7ca
+  // ### TRNG (random number generator)
+  // (user-mode non-standard read-only)
+  // (per core) register
+  */
+  #define CSR_TRNG 0xcc0
+  /*
+  // ### PUF (physical unclonable function)
+  // (system-wide) registers
+  // (machine-mode non-standard read/write)
+  #define CSR_MPUFSELECT 0x7cb
+  #define CSR_MPUFDISABLE 0x7cc
+  // (machine-mode non-standard read-only)
+  #define CSR_MPUFREADOUT 0xfc0
+  // Check priv-1.10 spec to make sure we can't use memory protection for some of this
+  */
+// </SANCTUM>
 #define CSR_MEPC 0x341
 #define CSR_MCAUSE 0x342
 #define CSR_MBADADDR 0x343
@@ -1037,6 +1095,64 @@ DECLARE_CSR(mie, CSR_MIE)
 DECLARE_CSR(mtvec, CSR_MTVEC)
 DECLARE_CSR(mcounteren, CSR_MCOUNTEREN)
 DECLARE_CSR(mscratch, CSR_MSCRATCH)
+// <SANCTUM>
+  /*
+  // ## The names ofvarious CSRs (registers) introduced by Sanctum are given here.
+
+  // ### Enclave virtual base and mask
+  // (per-core) registers
+  // ( defines a virtual region for which enclave page tables are used in
+  //   place of OS-controlled page tables)
+  // (machine-mode non-standard read/write)
+  DECLARE_CSR(mevbase, CSR_MEVBASE)
+  DECLARE_CSR(mevmask, CSR_MEVMASK)
+
+  // ### Enclave page table base
+  // (per core) register
+  // ( pointer to a separate page table data structure used to translate enclave
+  //   virtual addresses)
+  // (machine-mode non-standard read/write)
+  DECLARE_CSR(meptbr, CSR_MEPTBR)
+
+  // ### DRAM bitmap
+  // (per core) registers (OS and Enclave)
+  // ( white-lists the DRAM regions the core is allowed to access via OS and
+  //   enclave virtual addresses)
+  // (machine-mode non-standard read/write)
+  DECLARE_CSR(mdrbmap, CSR_MDRBMAP)
+  DECLARE_CSR(medrbmap, CSR_MEDRBMAP)
+
+  // ### Protected region base and mask
+  // (per core) registers (OS and Enclave)
+  // ( these are used to prevent address translation into a specific range of
+  //   physical addresses, for example to protect the security monitor from all software)
+  // (machine-mode non-standard read/write)
+  DECLARE_CSR(mparbase, CSR_MPARBASE)
+  DECLARE_CSR(mparmask, CSR_MPARMASK)
+  DECLARE_CSR(meparbase, CSR_MEPARBASE)
+  DECLARE_CSR(meparmask, CSR_MEPARMASK)
+
+  // ### DMA base and mask:
+  // (system-wide) register
+  // (machine-mode non-standard read/write)
+  DECLARE_CSR(mdmabase, CSR_MDMABASE)
+  DECLARE_CSR(mdmabound, CSR_MDMAMASK)
+  // ### TRNG (random number generator)
+  // (user-mode non-standard read-only)
+  // (per core) register
+  */
+  DECLARE_CSR(trng, CSR_TRNG)
+  /*
+  // ### PUF (physical unclonable function)
+  // (system-wide) registers
+  // (machine-mode non-standard read/write)
+  DECLARE_CSR(mpufselect, CSR_MPUFSELECT)
+  DECLARE_CSR(mpufdisable, CSR_MPUFDISABLE)
+  // (machine-mode non-standard read-only)
+  DECLARE_CSR(mpufreadout, CSR_MPUFREADOUT)
+  // Check priv-1.10 spec to make sure we can't use memory protection for some of this
+  */
+// </SANCTUM>
 DECLARE_CSR(mepc, CSR_MEPC)
 DECLARE_CSR(mcause, CSR_MCAUSE)
 DECLARE_CSR(mbadaddr, CSR_MBADADDR)

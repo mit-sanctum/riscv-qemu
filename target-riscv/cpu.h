@@ -91,6 +91,7 @@
 typedef struct CPURISCVState CPURISCVState;
 
 #include "pmp.h"
+//#include "puf/puf.h"
 
 typedef struct CPURISCVState {
     target_ulong gpr[32];
@@ -159,6 +160,68 @@ typedef struct CPURISCVState {
 
     /* Internal CPU feature flags. */
     uint64_t features;
+
+    // <SANCTUM>
+    /*
+    // ## The core state referenced by various CSRs (registers) introduced by Sanctum is declared here.
+
+    // ### Enclave virtual base and mask
+    // (per-core) registers
+    // ( defines a virtual region for which enclave page tables are used in
+    //   place of OS-controlled page tables)
+    // (machine-mode non-standard read/write)
+    uint64_t mevbase;
+    uint64_t mevmask;
+
+    // ### Enclave page table base
+    // (per core) register
+    // ( pointer to a separate page table data structure used to translate enclave
+    //   virtual addresses)
+    // (machine-mode non-standard read/write)
+    uint64_t meptbr;
+
+    // ### DRAM bitmap
+    // (per core) registers (OS and Enclave)
+    // ( white-lists the DRAM regions the core is allowed to access via OS and
+    //   enclave virtual addresses)
+    // (machine-mode non-standard read/write)
+    uint64_t mdrbmap;
+    uint64_t medrbmap;
+
+    // ### Protected region base and mask
+    // (per core) registers (OS and Enclave)
+    // ( these are used to prevent address translation into a specific range of
+    //   physical addresses, for example to protect the security monitor from all software)
+    // (machine-mode non-standard read/write)
+    uint64_t mparbase;
+    uint64_t mparmask;
+    uint64_t meparbase;
+    uint64_t meparmask;
+
+    // ### DMA base and mask:
+    // (system-wide) register
+    // (machine-mode non-standard read/write)
+    // TODO: These should be a system-wide CSR; declare elsewhere
+    uint64_t mdmabase;
+    uint64_t mdmamask;
+    // ### TRNG (random number generator)
+    // (user-mode non-standard read-only)
+    // (per core) register
+    // This is not a stateful element; declared elsewhere:
+    // sim->trng->read()
+    // ### PUF (physical unclonable function)
+    // (system-wide) registers
+    // (machine-mode non-standard read/write)
+    // These are be a system-wide CSR; declared elsewhere:
+    // sim->puf->select
+    // sim->puf->disable
+    // (machine-mode non-standard read-only)
+    // sim->puf->readout()
+    // Check priv-1.10 spec to make sure we can't use memory protection for some of this
+    */
+    // </SANCTUM>
+
+    //puf_t puf;
 
     /* QEMU */
     CPU_COMMON

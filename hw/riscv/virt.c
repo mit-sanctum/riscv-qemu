@@ -50,7 +50,7 @@ static const struct MemmapEntry {
 } virt_memmap[] =
 {
     [VIRT_DEBUG] =    {        0x0,      0x100 },
-    [VIRT_MROM] =     {     0x1000,     0x2000 },
+    [VIRT_MROM] =     {     0x1000,  0x1000000 }, // SANCTUM: rewrite start PC to 0x1000_000
     [VIRT_CLINT] =    {  0x2000000,    0x10000 },
     [VIRT_PLIC] =     {  0xc000000,  0x4000000 },
     [VIRT_VIRTIO] =   { 0x10000000,     0x1000 },
@@ -230,7 +230,7 @@ static void riscv_virt_board_init(MachineState *machine)
 
     /* boot rom */
     memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
-                           s->fdt_size + 0x2000, &error_fatal);
+                           s->fdt_size + 0x1000000, &error_fatal); // SANCTUM: allow for a larger boot ROM!
     vmstate_register_ram_global(boot_rom);
     memory_region_add_subregion(system_memory, 0x0, boot_rom);
 
@@ -270,8 +270,6 @@ static void riscv_virt_board_init(MachineState *machine)
       uint32_t jump_instruction = (((offset >> 1) & 0x3FF) << 21) | (((offset>>11) & 0x1) << 20) | (((offset>>12) & 0xFF) << 12) | (((offset>>20) & 0x1) << 31) | (0 << 7) | (0x6F << 0);
       cpu_physical_memory_write(ROM_BASE + 12, &jump_instruction, 4);
 
-      printf("Bootloader offset is %" PRIx32 "\n", offset);
-
       // Append bootloader to boot ROM
       FILE *bootloader_file;
       long bootloader_size;
@@ -292,7 +290,14 @@ static void riscv_virt_board_init(MachineState *machine)
 
       fclose(bootloader_file);
 
-      cpu_physical_memory_write(ROM_BASE + sizeof(reset_vec)+s->fdt_size, bootloader_bytes, bootloader_size);
+      //int i;
+      //for(i=0; i<bootloader_size; i+=4){
+      //  printf( "0x%04lx : 0x%08x\n", ( ROM_BASE + sizeof(reset_vec) + (s->fdt_size) + i ),  *( (unsigned int *)(bootloader_bytes+i) ) );
+      //}
+
+      printf( "SANCTUM BOOTLOADER @ 0x%08lx , 0x%08x\n bytes", ( ROM_BASE + sizeof(reset_vec) + (s->fdt_size) ), bootloader_size );
+
+      cpu_physical_memory_write(ROM_BASE + sizeof(reset_vec) + (s->fdt_size), bootloader_bytes, bootloader_size);
       free(bootloader_bytes);
     }
     // </SANCTUM>
